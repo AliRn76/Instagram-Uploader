@@ -1,6 +1,7 @@
-import glob
+import os
 import cv2 as cv
-from instabot import Bot
+from instagrapi import Client
+from termcolor import colored
 from PIL import Image, ImageOps
 
 
@@ -15,10 +16,10 @@ def resize_with_padding(img, expected_size):
 
 
 """ Initial """
-PICTURE_NAME = 'subject2.jpg'
-WATERMARK = '3434.png'
-TOP_SIGN = 'top-bar2.jpg'
-BOTTOM_SIGN = 'like-bar3.jpg'
+PICTURE_NAME = 'subject1.jpg'
+WATERMARK = 'watermark.png'
+TOP_SIGN = 'top-bar.jpg'
+BOTTOM_SIGN = 'like-bar.jpg'
 ACCOUNT_USER = '__akbar__akbar__123'
 ACCOUNT_PASS = '__akbar__akbar'
 
@@ -61,26 +62,33 @@ result = cv.addWeighted(roi, 0.5, watermark, 1, 1)
 cropped_img[_top: _bottom, _left: _right] = result
 # Write Final Image
 final_h, final_w, _ = cropped_img.shape
+cv.imwrite('cropped_img.jpg', cropped_img)
 if final_h < final_w and final_h < 500:
-    final_img = Image.open('./final_img.jpg')
+    final_img = Image.open('./cropped_img.jpg')
     final_img = resize_with_padding(final_img, (final_w, 500))
     final_img.save('final_img.jpg')
 else:
     cv.imwrite('final_img.jpg', cropped_img)
+# Remove Cropped Image
+os.remove('cropped_img.jpg')
 
 # Show The Final Image
-final_img = Image.open('./final_img.jpg')
-final_img.show()
+# final_img = Image.open('./final_img.jpg')
+# final_img.show()
 
 
 """ Post It On Instagram """
-
-# cookie_del = glob.glob('config/*cookie.json')
-# # os.remove(cookie_del[0])
-# bot = Bot()
-#
-# bot.login(username=ACCOUNT_USER, password=ACCOUNT_PASS, is_threaded=True)
-#
-# bot.upload_photo('final_img.jpg', caption='hello')
-
-
+cl = Client()
+cl.login(ACCOUNT_USER, ACCOUNT_PASS)
+media = cl.photo_upload(
+    path='final_img.jpg',
+    caption='this is the test caption from ali :)'
+)
+photo_url = media.dict().get('thumbnail_url')
+if photo_url is not None:
+    print(colored('Upload Successfully', 'green'))
+    print('Photo Url: ', media.dict().get('thumbnail_url'))
+    # Remove Final Image
+    os.remove('final_img.jpg')
+else:
+    print(colored('Failed To Upload', 'red'))
