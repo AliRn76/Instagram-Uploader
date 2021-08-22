@@ -26,8 +26,8 @@ final_h, final_w, _ = picture.shape
 cv.imwrite('final_img.jpg', picture)
 
 # Show The Final Image
-final_img = Image.open('./final_img.jpg')
-final_img.show()
+# final_img = Image.open('./final_img.jpg')
+# final_img.show()
 
 
 """ Post It On Instagram """
