@@ -21,7 +21,7 @@ WATERMARK = 'watermark.png'
 TOP_SIGN = 'top-bar.jpg'
 BOTTOM_SIGN = 'like-bar.jpg'
 ACCOUNT_USER = '__akbar__akbar__123'
-ACCOUNT_PASS = '__akbar__akbar'
+ACCOUNT_PASS = 'akbar'
 
 """ Read Images """
 like_bar = cv.imread(BOTTOM_SIGN, 0)
