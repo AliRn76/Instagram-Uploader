@@ -1,8 +1,11 @@
 import os
 from discord.ext import commands
+from dotenv import dotenv_values
 
 client = commands.Bot(command_prefix=".", description="Soon")
 
+config = dotenv_values('.secret_keys')
+BOT_KEY = config['BOT_KEY']
 
 @client.command()
 async def loads(ctx, extension):
@@ -17,4 +20,4 @@ for filename in os.listdir('./cogs'):
     if filename.endswith(".py"):
         client.load_extension(f"cogs.{filename[:-3]}")
 
-client.run("ODc5MDg3NDEyODgwNDk4NzY4.YSKn8w.KhVYKMYBqBpSWq27sFYmpICinfk")
+client.run(BOT_KEY)
