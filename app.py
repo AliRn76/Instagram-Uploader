@@ -14,6 +14,7 @@ TOP_SIGN = 'top-bar.jpg'
 BOTTOM_SIGN = 'like-bar.jpg'
 ACCOUNT_USER = config['ACCOUNT_USER']
 ACCOUNT_PASS = config['ACCOUNT_PASS']
+BOT_KEY = config['BOT_KEY']
 
 
 def resize_with_padding(img, expected_size):
