@@ -7,7 +7,7 @@ import uuid
 import requests
 import shutil
 
-valid_images = ("png", "jpeg", "jpg")
+valid_images = ["png", "jpeg", "jpg"]
 
 
 class InstaBot(commands.Cog):
@@ -21,7 +21,7 @@ class InstaBot(commands.Cog):
 
     @commands.command(name="url")
     async def url(self, ctx, url):
-        if url[0:26] == "https://cdn.discordapp.com":
+        if url[0:26] == "https://cdn.discordapp.com" and url[-3:] in valid_images:
             r = requests.get(url, stream=True)
             imageName = str(uuid.uuid4()) + '.jpg'
             with open("images/" + imageName, 'wb') as out_file:
