@@ -75,10 +75,14 @@ def final_image(picture_path: str):
         cv.imwrite(final_path, cropped_img)
     # Remove Cropped Image
     os.remove('cropped_img.jpg')
+
     # Show The Final Image
-    final_img = Image.open(final_path)
-    final_img.show()
+    # final_img = Image.open(final_path)
+    # final_img.show()
+
+    # Upload To Instagram
     # upload_on_instagram(final_path)
+
     return final_path
 
 

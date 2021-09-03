@@ -17,4 +17,4 @@ for filename in os.listdir('./cogs'):
     if filename.endswith(".py"):
         client.load_extension(f"cogs.{filename[:-3]}")
 
-client.run("")
+client.run("ODc5MDg3NDEyODgwNDk4NzY4.YSKn8w.KhVYKMYBqBpSWq27sFYmpICinfk")
