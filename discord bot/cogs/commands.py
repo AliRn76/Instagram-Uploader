@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from db_center import add
 import asyncio
 import random
 import uuid

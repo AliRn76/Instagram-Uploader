@@ -1,8 +1,19 @@
 import os
+from datetime import datetime
+
 import cv2 as cv
 from instagrapi import Client
 from termcolor import colored
 from PIL import Image, ImageOps
+from dotenv import dotenv_values
+
+config = dotenv_values('.secret_keys')
+
+WATERMARK = 'watermark.png'
+TOP_SIGN = 'top-bar.jpg'
+BOTTOM_SIGN = 'like-bar.jpg'
+ACCOUNT_USER = config['ACCOUNT_USER']
+ACCOUNT_PASS = config['ACCOUNT_PASS']
 
 
 def resize_with_padding(img, expected_size):
@@ -15,80 +26,80 @@ def resize_with_padding(img, expected_size):
     return ImageOps.expand(img, padding)
 
 
-""" Initial """
-PICTURE_NAME = 'subject1.jpg'
-WATERMARK = 'watermark.png'
-TOP_SIGN = 'top-bar.jpg'
-BOTTOM_SIGN = 'like-bar.jpg'
-ACCOUNT_USER = '__akbar__akbar__123'
-ACCOUNT_PASS = 'akbar'
+def final_image(picture_path: str):
+    """ Read Images """
+    like_bar = cv.imread(BOTTOM_SIGN, 0)
+    top_bar = cv.imread(TOP_SIGN, 0)
+    template = cv.imread(picture_path, 0)
+    picture = cv.imread(picture_path)
+    watermark = cv.imread(WATERMARK)
 
-""" Read Images """
-like_bar = cv.imread(BOTTOM_SIGN, 0)
-top_bar = cv.imread(TOP_SIGN, 0)
-template = cv.imread(PICTURE_NAME, 0)
-picture = cv.imread(PICTURE_NAME)
-watermark = cv.imread(WATERMARK)
+    w, _ = template.shape[::-1]
+    watermark_height, watermark_width, _ = watermark.shape
 
-w, _ = template.shape[::-1]
-watermark_height, watermark_width, _ = watermark.shape
+    """ Find Top Of Base Image """
+    res2 = cv.matchTemplate(top_bar, template, cv.TM_CCOEFF_NORMED)
+    top_bar_height, _ = top_bar.shape
+    _, _, _, _top = cv.minMaxLoc(res2)
 
-""" Find Top Of Base Image """
-res2 = cv.matchTemplate(top_bar, template, cv.TM_CCOEFF_NORMED)
-top_bar_height, _ = top_bar.shape
-_, _, _, _top = cv.minMaxLoc(res2)
+    """ Find Bottom Of Base Image """
+    res = cv.matchTemplate(like_bar, template, cv.TM_CCOEFF_NORMED)
+    _, _, _, _bottom = cv.minMaxLoc(res)
 
-""" Find Bottom Of Base Image """
-res = cv.matchTemplate(like_bar, template, cv.TM_CCOEFF_NORMED)
-_, _, _, _bottom = cv.minMaxLoc(res)
+    """ Crop Base Image """
+    top = _top[1] + top_bar_height
+    bottom = _bottom[1]
+    left = 0
+    right = w
+    cropped_img = picture[top:bottom, left:right]
+    # cropped_img = cv.flip(cropped_img, 1)  # Flip Image (doesnt work if image has words)
 
-
-""" Crop Base Image """
-top = _top[1] + top_bar_height
-bottom = _bottom[1]
-left = 0
-right = w
-cropped_img = picture[top:bottom, left:right]
-# cropped_img = cv.flip(cropped_img, 1)  # Flip Image (doesnt work if image has words)
-
-""" Add Watermark To Base Image """
-# Watermark Position In Cropped Picture
-_top, _left, _bottom, _right = 0, 0, watermark_height, watermark_width
-# Get ROI
-roi = cropped_img[_top: _bottom, _left: _right]
-# Add the Logo to the Roi
-result = cv.addWeighted(roi, 0.5, watermark, 1, 1)
-# Replace the ROI on the image
-cropped_img[_top: _bottom, _left: _right] = result
-# Write Final Image
-final_h, final_w, _ = cropped_img.shape
-cv.imwrite('cropped_img.jpg', cropped_img)
-if final_h < final_w and final_h < 500:
-    final_img = Image.open('./cropped_img.jpg')
-    final_img = resize_with_padding(final_img, (final_w, 500))
-    final_img.save('final_img.jpg')
-else:
-    cv.imwrite('final_img.jpg', cropped_img)
-# Remove Cropped Image
-os.remove('cropped_img.jpg')
-
-# Show The Final Image
-# final_img = Image.open('./final_img.jpg')
-# final_img.show()
+    """ Add Watermark To Base Image """
+    # Watermark Position In Cropped Picture
+    _top, _left, _bottom, _right = 0, 0, watermark_height, watermark_width
+    # Get ROI
+    roi = cropped_img[_top: _bottom, _left: _right]
+    # Add the Logo to the Roi
+    result = cv.addWeighted(roi, 0.5, watermark, 1, 1)
+    # Replace the ROI on the image
+    cropped_img[_top: _bottom, _left: _right] = result
+    # Write Final Image
+    final_h, final_w, _ = cropped_img.shape
+    cv.imwrite('cropped_img.jpg', cropped_img)
+    final_path = str(datetime.now()) + '.jpg'
+    if final_h < final_w and final_h < 500:
+        final_img = Image.open('./cropped_img.jpg')
+        final_img = resize_with_padding(final_img, (final_w, 500))
+        final_img.save(final_path)
+    else:
+        cv.imwrite(final_path, cropped_img)
+    # Remove Cropped Image
+    os.remove('cropped_img.jpg')
+    # Show The Final Image
+    final_img = Image.open(final_path)
+    final_img.show()
+    # upload_on_instagram(final_path)
+    return final_path
 
 
-""" Post It On Instagram """
-cl = Client()
-cl.login(ACCOUNT_USER, ACCOUNT_PASS)
-media = cl.photo_upload(
-    path='final_img.jpg',
-    caption='this is the test caption from ali :)'
-)
-photo_url = media.dict().get('thumbnail_url')
-if photo_url is not None:
-    print(colored('Upload Successfully', 'green'))
-    print('Photo Url: ', media.dict().get('thumbnail_url'))
-    # Remove Final Image
-    os.remove('final_img.jpg')
-else:
-    print(colored('Failed To Upload', 'red'))
+def upload_on_instagram(image_path: str):
+    """ Post It On Instagram """
+    print('Start Uploading ... ')
+    cl = Client()
+    cl.login(ACCOUNT_USER, ACCOUNT_PASS)
+    media = cl.photo_upload(
+        path=image_path,
+        caption='this is the test caption from ali :)'
+    )
+    photo_url = media.dict().get('thumbnail_url')
+    if photo_url is not None:
+        print(colored('Upload Successfully', 'green'))
+        print('Photo Url: ', media.dict().get('thumbnail_url'))
+        # Remove Final Image
+        os.remove(image_path)
+    else:
+        print(colored('Failed To Upload', 'red'))
+
+# final_image('subject1.jpg')
+
+
