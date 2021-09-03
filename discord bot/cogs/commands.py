@@ -1,14 +1,16 @@
 import discord
-from discord.ext import commands
-from db_center import add
-import asyncio
-import random
 import uuid
-import requests
-import shutil
+import requests, shutil
+import os, random
+from CALL import final_image
+from discord.ext import commands
+
 
 valid_images = ["png", "jpeg", "jpg"]
 
+def random_image() -> str:
+    image_path = random.choice(os.listdir("../images/"))
+    return image_path
 
 class InstaBot(commands.Cog):
     def __init__(self, client):
@@ -27,6 +29,11 @@ class InstaBot(commands.Cog):
             with open("images/" + imageName, 'wb') as out_file:
                 print('Saving image: ' + imageName)
                 shutil.copyfileobj(r.raw, out_file)
+
+    @commands.command(name="watermark")
+    async def watermark(self, ctx):
+        new_path = final_image(random_image())
+        await ctx.send(file=discord.File(new_path))
 
 
 def setup(client):
