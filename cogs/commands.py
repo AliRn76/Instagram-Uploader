@@ -2,17 +2,18 @@ import os
 import uuid
 import random
 import shutil
+from PIL.Image import new
 import discord
 import requests
 from app import final_image
 from discord.ext import commands
 
-
+image_dir = "/home/mahanbi/Projects/Instagram-Uploader/images/"
 valid_images = ['png', 'jpeg', 'jpg']
 
 def random_image() -> str:
-    image_path = random.choice(os.listdir('../images/'))
-    return image_path
+    image_path = random.choice(os.listdir(image_dir))
+    return image_dir + image_path
 
 class InstaBot(commands.Cog):
     def __init__(self, client):
@@ -34,8 +35,10 @@ class InstaBot(commands.Cog):
 
     @commands.command(name='watermark')
     async def watermark(self, ctx):
-        new_path = final_image(random_image())
+        random_image_path = random_image()
+        new_path = final_image(random_image_path)
         await ctx.send(file=discord.File(new_path))
+        os.remove(random_image_path)
 
 
 def setup(client):
