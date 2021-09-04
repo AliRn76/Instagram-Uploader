@@ -28,6 +28,7 @@ def resize_with_padding(img, expected_size):
 
 def final_image(picture_path: str):
     """ Read Images """
+    # TODO: change the like_bar (it should handle the slide posts)
     like_bar = cv.imread(BOTTOM_SIGN, 0)
     top_bar = cv.imread(TOP_SIGN, 0)
     template = cv.imread(picture_path, 0)
@@ -35,6 +36,7 @@ def final_image(picture_path: str):
     watermark = cv.imread(WATERMARK)
 
     w, _ = template.shape[::-1]
+    # TODO: fix the width and height of watermark with original picture
     watermark_height, watermark_width, _ = watermark.shape
 
     """ Find Top Of Base Image """
