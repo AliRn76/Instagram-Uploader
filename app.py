@@ -8,7 +8,6 @@ from PIL import Image, ImageOps
 from dotenv import dotenv_values
 
 config = dotenv_values('.secret_keys')
-
 WATERMARK = 'watermark.png'
 TOP_SIGN = 'top-bar.jpg'
 BOTTOM_SIGN = 'like-bar.jpg'
@@ -67,7 +66,7 @@ def final_image(picture_path: str):
     # Write Final Image
     final_h, final_w, _ = cropped_img.shape
     cv.imwrite('cropped_img.jpg', cropped_img)
-    final_path = str(datetime.now()) + '.jpg'
+    final_path = "images/final/" + str(datetime.now()) + '.jpg'
     if final_h < final_w and final_h < 500:
         final_img = Image.open('./cropped_img.jpg')
         final_img = resize_with_padding(final_img, (final_w, 500))
