@@ -1,9 +1,9 @@
 import os
 from discord.ext import commands
+
 from app import BOT_KEY
 
 client = commands.Bot(command_prefix=".", description="Soon")
-
 
 @client.command()
 async def loads(ctx, extension):

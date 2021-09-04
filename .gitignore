@@ -2,3 +2,5 @@
 .secret_keys
 .idea
 __pycache__
+venv
+images
