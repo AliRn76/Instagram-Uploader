@@ -8,7 +8,8 @@ from PIL import Image, ImageOps
 from dotenv import dotenv_values
 
 config = dotenv_values('.secret_keys')
-WATERMARK = 'watermark.png'
+WATERMARK720 = 'watermark720.png'
+WATERMARK1080 = 'watermark1080.png'
 TOP_SIGN = 'top-bar.jpg'
 BOTTOM_SIGN = 'like-bar.jpg'
 ACCOUNT_USER = config['ACCOUNT_USER']
@@ -33,8 +34,8 @@ def final_image(picture_path: str):
     top_bar = cv.imread(TOP_SIGN, 0)
     template = cv.imread(picture_path, 0)
     picture = cv.imread(picture_path)
-    watermark = cv.imread(WATERMARK)
-
+    watermark = cv.imread(WATERMARK1080 if picture.shape[1] == 1080 else WATERMARK720)
+    # TODO: we can use "wconvert ali.jpg -resize 720x123 alii.jpg" later
     w, _ = template.shape[::-1]
     # TODO: fix the width and height of watermark with original picture
     watermark_height, watermark_width, _ = watermark.shape
@@ -79,9 +80,9 @@ def final_image(picture_path: str):
     os.remove('cropped_img.jpg')
 
     # Show The Final Image
-    # final_img = Image.open(final_path)
-    # final_img.show()
-
+    final_img = Image.open(final_path)
+    final_img.show()
+    os.remove(final_path)
     # Upload To Instagram
     # upload_on_instagram(final_path)
 
@@ -106,6 +107,7 @@ def upload_on_instagram(image_path: str):
     else:
         print(colored('Failed To Upload', 'red'))
 
-# final_image('subject1.jpg')
+
+final_image('Screenshot_20210902-204408.png')
 
 
