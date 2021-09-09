@@ -80,9 +80,9 @@ def final_image(picture_path: str):
     os.remove('cropped_img.jpg')
 
     # Show The Final Image
-    final_img = Image.open(final_path)
-    final_img.show()
-    os.remove(final_path)
+    # final_img = Image.open(final_path)
+    # final_img.show()
+    # os.remove(final_path)
     # Upload To Instagram
     # upload_on_instagram(final_path)
 
