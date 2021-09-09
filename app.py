@@ -35,7 +35,7 @@ def final_image(picture_path: str):
     template = cv.imread(picture_path, 0)
     picture = cv.imread(picture_path)
     watermark = cv.imread(WATERMARK1080 if picture.shape[1] == 1080 else WATERMARK720)
-    # TODO: we can use "wconvert ali.jpg -resize 720x123 alii.jpg" later
+    # TODO: we can use "convert ali.jpg -resize 720x123 alii.jpg" later
     w, _ = template.shape[::-1]
     # TODO: fix the width and height of watermark with original picture
     watermark_height, watermark_width, _ = watermark.shape
@@ -108,6 +108,6 @@ def upload_on_instagram(image_path: str):
         print(colored('Failed To Upload', 'red'))
 
 
-final_image('Screenshot_20210902-204408.png')
+# final_image('Screenshot_20210902-204408.png')
 
 
