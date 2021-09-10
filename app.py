@@ -8,89 +8,60 @@ from PIL import Image, ImageOps
 from dotenv import dotenv_values
 
 config = dotenv_values('.secret_keys')
-WATERMARK720 = 'watermark720.png'
-WATERMARK1080 = 'watermark1080.png'
-TOP_SIGN = 'top-bar.jpg'
-BOTTOM_SIGN = 'like-bar.jpg'
+WATERMARK = 'watermark1080.png'
 ACCOUNT_USER = config['ACCOUNT_USER']
 ACCOUNT_PASS = config['ACCOUNT_PASS']
+TEMP_USER = config['ACCOUNT_PASS']
+TEMP_PASS = config['ACCOUNT_PASS']
 BOT_KEY = config['BOT_KEY']
 
 
-def resize_with_padding(img, expected_size):
-    img.thumbnail((expected_size[0], expected_size[1]))
-    delta_width = expected_size[0] - img.size[0]
-    delta_height = expected_size[1] - img.size[1]
-    pad_width = delta_width // 2
-    pad_height = delta_height // 2
-    padding = (pad_width, pad_height, delta_width - pad_width, delta_height - pad_height)
-    return ImageOps.expand(img, padding)
-
-
-def final_image(picture_url: str):
-    """ Read Images """
+def handle_image_url(url: str) -> str:
     # picture_url = 'https://www.instagram.com/p/CTpABt4tJPU/' or
     #   'https://www.instagram.com/p/CTpABt4tJPU/?utm_source=ig_web_copy_link'
     first = 28
-    last = picture_url[first:].find('/')
-    image_tag = picture_url[first:first+last]
+    last = url[first:].find('/')
+    image_tag = url[first:first+last]
     # image_tag = 'CTpABt4tJPU'
-    os.system(f'instaloader --login=programmers_n1_downloader2 --password=ali123 -- -{image_tag}')
-    # TODO: go to the folder --> folder_name is = '-{image_tag}'
-    # TODO: find the image
-    # TODO: use the image_path as picture_path in line below
-    picture_path = f'-{image_tag}' + '/' + ...
-    cropped_img = picture_path
+    return image_tag
 
-    # TODO: change the like_bar (it should handle the slide posts)
-    like_bar = cv.imread(BOTTOM_SIGN, 0)
-    top_bar = cv.imread(TOP_SIGN, 0)
-    template = cv.imread(picture_path, 0)
+def download_image(image_tag: str):
+    os.system(f'instaloader --login={TEMP_USER} --password={TEMP_PASS} -- -{image_tag}')
+
+def get_image_path(folder_name):
+    new = os.listdir('-' + folder_name)
+    for i in new:
+        if i.endswith('.jpg'):
+            return f'-{folder_name}' + '/' + i
+
+def resize_watermark(width):
+    os.system(f'convert {WATERMARK} -resize {width}x123 temp_watermark.jpg')
+
+
+def final_image(picture_url: str):
+    """ Handle ImageUrl --> Download Image --> Find Image Path --> Read Image"""
+    image_tag = handle_image_url(url=picture_url)
+    # download_image(image_tag=image_tag)
+    picture_path = get_image_path(folder_name=image_tag)
+    picture_path = '-CTpABt4tJPU/2021-09-10_12-11-24_UTC.jpg'
     picture = cv.imread(picture_path)
-    watermark = cv.imread(WATERMARK1080 if picture.shape[1] == 1080 else WATERMARK720)
-    # TODO: we can use "convert ali.jpg -resize 720x123 alii.jpg" later
-    w, _ = template.shape[::-1]
-    # TODO: fix the width and height of watermark with original picture
-    watermark_height, watermark_width, _ = watermark.shape
+    picture_height, picture_width, _ = picture.shape
 
-    # """ Find Top Of Base Image """
-    # res2 = cv.matchTemplate(top_bar, template, cv.TM_CCOEFF_NORMED)
-    # top_bar_height, _ = top_bar.shape
-    # _, _, _, _top = cv.minMaxLoc(res2)
-
-    # """ Find Bottom Of Base Image """
-    # res = cv.matchTemplate(like_bar, template, cv.TM_CCOEFF_NORMED)
-    # _, _, _, _bottom = cv.minMaxLoc(res)
-
-    # """ Crop Base Image """
-    # top = _top[1] + top_bar_height
-    # bottom = _bottom[1]
-    # left = 0
-    # right = w
-    # cropped_img = picture[top:bottom, left:right]
-    # # cropped_img = cv.flip(cropped_img, 1)  # Flip Image (doesnt work if image has words)
-
-    """ Add Watermark To Base Image """
-    # Watermark Position In Cropped Picture
-    _top, _left, _bottom, _right = 0, 0, watermark_height, watermark_width
+    """ Resize Watermark With New Width --> Read Watermark --> Replace It On Picture --> Write New Picture """
+    resize_watermark(width=picture_width)
+    watermark = cv.imread('temp_watermark.jpg')
+    # Add Watermark To Base Image
+    watermark_height, _, _ = watermark.shape
+    _top, _bottom, _left, _right = 0, watermark_height, 0, picture_width
     # Get ROI
-    roi = cropped_img[_top: _bottom, _left: _right]
+    roi = picture[_top: _bottom, _left: _right]
     # Add the Logo to the Roi
     result = cv.addWeighted(roi, 0.5, watermark, 1, 1)
     # Replace the ROI on the image
-    cropped_img[_top: _bottom, _left: _right] = result
+    picture[_top: _bottom, _left: _right] = result
     # Write Final Image
-    final_h, final_w, _ = cropped_img.shape
-    cv.imwrite('cropped_img.jpg', cropped_img)
-    final_path = "images/final/" + str(datetime.now()) + '.jpg'
-    if final_h < final_w and final_h < 500:
-        final_img = Image.open('./cropped_img.jpg')
-        final_img = resize_with_padding(final_img, (final_w, 500))
-        final_img.save(final_path)
-    else:
-        cv.imwrite(final_path, cropped_img)
-    # Remove Cropped Image
-    os.remove('cropped_img.jpg')
+    final_path = 'final_image.jpg'
+    cv.imwrite(final_path, picture)
 
     # Show The Final Image
     # final_img = Image.open(final_path)
@@ -121,6 +92,6 @@ def upload_on_instagram(image_path: str):
         print(colored('Failed To Upload', 'red'))
 
 
-# final_image('photo_2021-09-10_15-24-13.jpg')
+# final_image('https://www.instagram.com/p/CTpABt4tJPU/')
 
 
