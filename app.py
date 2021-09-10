@@ -27,8 +27,21 @@ def resize_with_padding(img, expected_size):
     return ImageOps.expand(img, padding)
 
 
-def final_image(picture_path: str):
+def final_image(picture_url: str):
     """ Read Images """
+    # picture_url = 'https://www.instagram.com/p/CTpABt4tJPU/' or
+    #   'https://www.instagram.com/p/CTpABt4tJPU/?utm_source=ig_web_copy_link'
+    first = 28
+    last = picture_url[first:].find('/')
+    image_tag = picture_url[first:first+last]
+    # image_tag = 'CTpABt4tJPU'
+    os.system(f'instaloader --login=programmers_n1_downloader2 --password=ali123 -- -{image_tag}')
+    # TODO: go to the folder --> folder_name is = '-{image_tag}'
+    # TODO: find the image
+    # TODO: use the image_path as picture_path in line below
+    picture_path = f'-{image_tag}' + '/' + ...
+    cropped_img = picture_path
+
     # TODO: change the like_bar (it should handle the slide posts)
     like_bar = cv.imread(BOTTOM_SIGN, 0)
     top_bar = cv.imread(TOP_SIGN, 0)
@@ -40,22 +53,22 @@ def final_image(picture_path: str):
     # TODO: fix the width and height of watermark with original picture
     watermark_height, watermark_width, _ = watermark.shape
 
-    """ Find Top Of Base Image """
-    res2 = cv.matchTemplate(top_bar, template, cv.TM_CCOEFF_NORMED)
-    top_bar_height, _ = top_bar.shape
-    _, _, _, _top = cv.minMaxLoc(res2)
+    # """ Find Top Of Base Image """
+    # res2 = cv.matchTemplate(top_bar, template, cv.TM_CCOEFF_NORMED)
+    # top_bar_height, _ = top_bar.shape
+    # _, _, _, _top = cv.minMaxLoc(res2)
 
-    """ Find Bottom Of Base Image """
-    res = cv.matchTemplate(like_bar, template, cv.TM_CCOEFF_NORMED)
-    _, _, _, _bottom = cv.minMaxLoc(res)
+    # """ Find Bottom Of Base Image """
+    # res = cv.matchTemplate(like_bar, template, cv.TM_CCOEFF_NORMED)
+    # _, _, _, _bottom = cv.minMaxLoc(res)
 
-    """ Crop Base Image """
-    top = _top[1] + top_bar_height
-    bottom = _bottom[1]
-    left = 0
-    right = w
-    cropped_img = picture[top:bottom, left:right]
-    # cropped_img = cv.flip(cropped_img, 1)  # Flip Image (doesnt work if image has words)
+    # """ Crop Base Image """
+    # top = _top[1] + top_bar_height
+    # bottom = _bottom[1]
+    # left = 0
+    # right = w
+    # cropped_img = picture[top:bottom, left:right]
+    # # cropped_img = cv.flip(cropped_img, 1)  # Flip Image (doesnt work if image has words)
 
     """ Add Watermark To Base Image """
     # Watermark Position In Cropped Picture
@@ -108,6 +121,6 @@ def upload_on_instagram(image_path: str):
         print(colored('Failed To Upload', 'red'))
 
 
-# final_image('Screenshot_20210902-204408.png')
+# final_image('photo_2021-09-10_15-24-13.jpg')
 
 
