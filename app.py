@@ -39,15 +39,25 @@ def resize_watermark(width):
 
 
 def final_image(picture_url: str):
-    """ Handle ImageUrl --> Download Image --> Find Image Path --> Read Image"""
+    """
+    Handle ImageUrl -->
+    Download Image -->
+    Find Image Path -->
+    Read Image
+    """
     image_tag = handle_image_url(url=picture_url)
-    # download_image(image_tag=image_tag)
+    download_image(image_tag=image_tag)
     picture_path = get_image_path(folder_name=image_tag)
-    picture_path = '-CTpABt4tJPU/2021-09-10_12-11-24_UTC.jpg'
     picture = cv.imread(picture_path)
     picture_height, picture_width, _ = picture.shape
 
-    """ Resize Watermark With New Width --> Read Watermark --> Replace It On Picture --> Write New Picture """
+    """ 
+    Resize Watermark With New Width --> 
+    Read Watermark --> 
+    Replace It On Picture --> 
+    Remove Temp Watermark --> 
+    Write New Picture 
+    """
     resize_watermark(width=picture_width)
     watermark = cv.imread('temp_watermark.jpg')
     # Add Watermark To Base Image
@@ -59,6 +69,9 @@ def final_image(picture_url: str):
     result = cv.addWeighted(roi, 0.5, watermark, 1, 1)
     # Replace the ROI on the image
     picture[_top: _bottom, _left: _right] = result
+    # Remove Temp Watermark
+    os.remove('temp_watermark.jpg')
+
     # Write Final Image
     final_path = 'final_image.jpg'
     cv.imwrite(final_path, picture)
