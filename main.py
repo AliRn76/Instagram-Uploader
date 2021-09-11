@@ -1,9 +1,12 @@
 import os
+from dotenv import dotenv_values
 from discord.ext import commands
 
-from app import BOT_KEY
+config = dotenv_values('.secret_keys')
+BOT_KEY = config['BOT_KEY']
+OWNERS = config['OWNERS']
 
-client = commands.Bot(command_prefix=".", description="Soon")
+client = commands.Bot(command_prefix="--")
 
 @client.command()
 async def loads(ctx, extension):

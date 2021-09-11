@@ -9,10 +9,10 @@ from dotenv import dotenv_values
 
 config = dotenv_values('.secret_keys')
 WATERMARK = 'watermark1080.png'
-ACCOUNT_USER = config['ACCOUNT_USER']
-ACCOUNT_PASS = config['ACCOUNT_PASS']
-TEMP_USER = config['ACCOUNT_PASS']
-TEMP_PASS = config['ACCOUNT_PASS']
+#ACCOUNT_USER = config['ACCOUNT_USER']
+#ACCOUNT_PASS = config['ACCOUNT_PASS']
+TEMP_USER = config['TEMP_USER']
+TEMP_PASS = config['TEMP_PASS']
 BOT_KEY = config['BOT_KEY']
 
 
@@ -50,7 +50,6 @@ def final_image(picture_url: str):
     picture_path = get_image_path(folder_name=image_tag)
     picture = cv.imread(picture_path)
     picture_height, picture_width, _ = picture.shape
-
     """ 
     Resize Watermark With New Width --> 
     Read Watermark --> 
@@ -82,7 +81,6 @@ def final_image(picture_url: str):
     # os.remove(final_path)
     # Upload To Instagram
     # upload_on_instagram(final_path)
-
     return final_path
 
 
@@ -103,8 +101,3 @@ def upload_on_instagram(image_path: str):
         os.remove(image_path)
     else:
         print(colored('Failed To Upload', 'red'))
-
-
-# final_image('https://www.instagram.com/p/CTpABt4tJPU/')
-
-

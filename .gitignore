@@ -1,6 +1,7 @@
 .venv
 .secret_keys
 .idea
-__pycache__
+**/__pycache__
+cogs/__pycache__
 venv
 images
