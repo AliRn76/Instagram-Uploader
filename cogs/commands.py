@@ -13,8 +13,8 @@ class InstaBot(commands.Cog):
     async def url(self, ctx, url):
         if valid_insta_url == url[:26]:
             image_path = final_image(url)
-            await ctx.send(file=discord.File("/home/mahanbi/PYTHON/Instagram-Uploader/" + image_path))
-            os.remove("/home/mahanbi/PYTHON/Instagram-Uploader/" + image_path)
+            await ctx.send(file=discord.File("/root/dev/Instagram-Uploader/" + image_path))
+            os.remove("/root/dev/Instagram-Uploader/" + image_path)
         else:
             await ctx.reply("Bad URL")
 
