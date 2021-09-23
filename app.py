@@ -35,10 +35,18 @@ def get_image_path(folder_name):
             return f'-{folder_name}' + '/' + i
 
 def resize_watermark(width):
-    os.system(f'convert {WATERMARK} -resize {width}x123 temp_watermark.jpg')
+    _height, _, _ = cv.imread(WATERMARK).shape
+    os.system(f'convert {WATERMARK} -resize {width}x{_height} temp_watermark.jpg')
 
+def validate_fade(fade: int):
+    try:
+        fade = int(fade)
+    except ValueError:
+        raise ValueError('fade should be int')
+    if fade < 0 or 10 < fade:
+        raise ValueError('fade should be between 0 - 10')
 
-def final_image(picture_url: str):
+def final_image(picture_url: str, fade: int = 7):
     """
     Handle ImageUrl -->
     Download Image -->
@@ -65,14 +73,14 @@ def final_image(picture_url: str):
     # Get ROI
     roi = picture[_top: _bottom, _left: _right]
     # Add the Logo to the Roi
-    result = cv.addWeighted(roi, 0.5, watermark, 1, 1)
+    result = cv.addWeighted(roi, fade/10, watermark, 1, 1)
     # Replace the ROI on the image
     picture[_top: _bottom, _left: _right] = result
     # Remove Temp Watermark
     os.remove('temp_watermark.jpg')
 
     # Write Final Image
-    final_path = 'final_image.jpg'
+    final_path = 'final_image2.jpg'
     cv.imwrite(final_path, picture)
 
     # Show The Final Image
