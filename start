@@ -1,4 +1,4 @@
 #! /bin/bash
 
 echo "Starting ..."
-pyhon main.py
+python main.py
