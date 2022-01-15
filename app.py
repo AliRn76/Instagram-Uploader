@@ -1,10 +1,7 @@
 import os
-from datetime import datetime
-
 import cv2 as cv
 from instagrapi import Client
 from termcolor import colored
-from PIL import Image, ImageOps
 from dotenv import dotenv_values
 
 config = dotenv_values('.secret_keys')
