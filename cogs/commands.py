@@ -1,7 +1,6 @@
 import discord
 import os
 from discord.ext import commands
-from app import final_image
 
 valid_insta_url = "https://www.instagram.com/"
 
